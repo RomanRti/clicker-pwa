@@ -6,12 +6,10 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('clicker')) {
-    event.respondWith(new Response('OK', { status: 200 }));
+// Обрабатываем сообщения от главных приложений
+self.addEventListener('message', (event) => {
+  if (event.data === 'click') {
+    const clickCount = parseInt(localStorage.getItem('clickCount') || '0', 10);
+    localStorage.setItem('clickCount', clickCount + 1);
   }
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
 });
