@@ -1,0 +1,13 @@
+default:
+  image: node:18
+
+pages:
+  stage: deploy
+  script:
+    - mkdir .public
+    - cp -r clicker stats service-worker.js .public/
+  artifacts:
+    paths:
+      - .public
+  only:
+    - main
