@@ -1,14 +1,8 @@
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').then(reg => {
-      console.log('Service Worker зарегистрирован:', reg);
-    });
-  });
-}
-
 function updateClickCount() {
-  const clickCount = localStorage.getItem('clickCount') || 0;
-  document.getElementById('click-count').textContent = `Количество кликов: ${clickCount}`;
+  const today = new Date().toISOString().split("T")[0];
+  const key = `clicks-${today}`;
+  const count = parseInt(localStorage.getItem(key) || "0");
+  document.getElementById("click-count").textContent = `Кликов сегодня: ${count}`;
 }
 
 window.addEventListener('load', updateClickCount);
