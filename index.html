@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Click Counter with History</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Clicker">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
+    }
+    #icon {
+      width: 100px;
+      height: 100px;
+      background: url('https://icons.iconarchive.com/icons/custom-icon-design/flatastic-4/512/Click-icon.png') no-repeat center/contain;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    #count {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 400px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    #history {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="icon" title="Click me!"></div>
+  <div id="count">0</div>
+  <button id="toggleHistory">Показать историю</button>
+  <div id="history">
+    <table>
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Клики</th>
+        </tr>
+      </thead>
+      <tbody id="historyTable"></tbody>
+    </table>
+  </div>
+  <script>
+    const icon = document.getElementById('icon');
+    const countText = document.getElementById('count');
+    const toggleHistoryBtn = document.getElementById('toggleHistory');
+    const historyDiv = document.getElementById('history');
+    const historyTable = document.getElementById('historyTable');
+    const getToday = () => new Date().toISOString().split('T')[0];
+    const loadCounts = () => {
+      const data = localStorage.getItem('clicks_by_day');
+      return data ? JSON.parse(data) : {};
+    };
+    const saveCounts = (counts) => {
+      localStorage.setItem('clicks_by_day', JSON.stringify(counts));
+    };
+    const renderHistory = () => {
+      historyTable.innerHTML = '';
+      const counts = loadCounts();
+      const sortedDates = Object.keys(counts).sort().reverse();
+      for (const date of sortedDates) {
+        const row = `<tr><td>${date}</td><td>${counts[date]}</td></tr>`;
+        historyTable.insertAdjacentHTML('beforeend', row);
+      }
+    };
+    let counts = loadCounts();
+    const today = getToday();
+    let todayCount = counts[today] || 0;
+    countText.textContent = todayCount;
+    icon.addEventListener('click', () => {
+      todayCount++;
+      counts[today] = todayCount;
+      saveCounts(counts);
+      countText.textContent = todayCount;
+    });
+    toggleHistoryBtn.addEventListener('click', () => {
+      const isVisible = historyDiv.style.display === 'block';
+      historyDiv.style.display = isVisible ? 'none' : 'block';
+      toggleHistoryBtn.textContent = isVisible ? 'Показать историю' : 'Скрыть историю';
+      if (!isVisible) renderHistory();
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
