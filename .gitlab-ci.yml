@@ -1,0 +1,13 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - mv clicker/* public/
+    - mv stats/* public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
